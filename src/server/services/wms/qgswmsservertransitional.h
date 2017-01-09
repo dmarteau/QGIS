@@ -18,7 +18,9 @@
 #ifndef QGSWMSSERVER_H
 #define QGSWMSSERVER_H
 
+#include "qgsconfig.h"
 #include "qgswmsconfigparser.h"
+#include "qgsserversettings.h"
 #include <QDomDocument>
 #include <QMap>
 #include <QPair>
@@ -42,6 +44,8 @@ class QgsVectorLayer;
 class QgsSymbol;
 class QgsSymbol;
 class QgsAccessControl;
+class QgsMapRendererJob;
+
 
 class QColor;
 class QFile;
@@ -69,7 +73,8 @@ namespace QgsWms
         const QString& configFilePath
         , QMap<QString, QString> &parameters
         , QgsWmsConfigParser* cp
-        , const QgsAccessControl* accessControl
+        , QgsAccessControl* accessControl
+        , const QgsServerSettings& settings
       );
       ~QgsWmsServer();
 
@@ -190,7 +195,7 @@ namespace QgsWms
       QStringList layerSet( const QStringList& layersList, const QStringList& stylesList, const QgsCoordinateReferenceSystem& destCRS, double scaleDenominator = -1 ) const;
 
       //! Record which symbols would be used if the map was in the current configuration of renderer. This is useful for content-based legend
-      void runHitTest( const QgsMapSettings& mapSettings, QPainter* painter, HitTest& hitTest );
+      void runHitTest( const QgsMapSettings& mapSettings, HitTest& hitTest );
       //! Record which symbols within one layer would be rendered with the given renderer context
       void runHitTestLayer( QgsVectorLayer* vl, SymbolSet& usedSymbols, QgsRenderContext& context );
 
@@ -272,8 +277,10 @@ namespace QgsWms
       QgsWmsConfigParser*    mConfigParser;
       QString                mConfigFilePath;
       //! The access control helper
-      const QgsAccessControl* mAccessControl;
+      QgsAccessControl* mAccessControl;
 
+      QgsServerSettings mSettings;
+ 
     public:
       QDomElement createFeatureGML(
         QgsFeature* feat,

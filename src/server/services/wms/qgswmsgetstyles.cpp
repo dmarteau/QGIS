@@ -32,7 +32,8 @@ namespace QgsWms
     QgsServerRequest::Parameters params = request.parameters();
     QgsWmsServer server( serverIface->configFilePath(), params,
                          getConfigParser( serverIface ),
-                         serverIface->accessControls() );
+                         serverIface->accessControls(),
+                        *serverIface->serverSettings());
     try
     {
       QDomDocument doc = server.getStyles();

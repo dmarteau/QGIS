@@ -33,7 +33,8 @@ namespace QgsWms
       Q_UNUSED( version );
       QgsWmsServer server( serverIface->configFilePath(), params,
                            getConfigParser( serverIface ),
-                           serverIface->accessControls() );
+                           serverIface->accessControls(),
+                          *serverIface->serverSettings());
 
       QString format = params.value( "FORMAT" );
       QString contentType;

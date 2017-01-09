@@ -16,6 +16,7 @@
  ***************************************************************************/
 
 
+
 #include "qgswmsservertransitional.h"
 #include "qgsfilterrestorer.h"
 #include "qgscapabilitiescache.h"
@@ -53,6 +54,9 @@
 #include "qgsaccesscontrol.h"
 #include "qgsfeaturerequest.h"
 #include "qgsmaprenderercustompainterjob.h"
+#include "qgsmaprendererparalleljob.h"
+#include "qgsserversettings.h"
+#include "qgsmapendererjobproxy.h"
 
 #include <QImage>
 #include <QPainter>
@@ -76,7 +80,8 @@ namespace QgsWms
     const QString& configFilePath
     , QMap<QString, QString> &parameters
     , QgsWmsConfigParser* cp
-    , const QgsAccessControl* accessControl
+    , QgsAccessControl* accessControl
+    , const QgsServerSettings& settings
   )
       : mParameters( parameters )
       , mOwnsConfigParser( false )
@@ -85,6 +90,7 @@ namespace QgsWms
       , mConfigParser( cp )
       , mConfigFilePath( configFilePath )
       , mAccessControl( accessControl )
+      , mSettings( settings )
   {
   }
 
@@ -685,10 +691,9 @@ namespace QgsWms
   }
 
 
-  void QgsWmsServer::runHitTest( const QgsMapSettings& mapSettings, QPainter* painter, HitTest& hitTest )
+  void QgsWmsServer::runHitTest( const QgsMapSettings& mapSettings, HitTest& hitTest )
   {
     QgsRenderContext context = QgsRenderContext::fromMapSettings( mapSettings );
-    context.setPainter( painter ); // we are not going to draw anything, but we still need a working painter
 
     Q_FOREACH ( const QString& layerID, mapSettings.layerIds() )
     {
@@ -1099,9 +1104,6 @@ namespace QgsWms
     QStringList layersList, stylesList, layerIdList;
     QImage* theImage = initializeRendering( layersList, stylesList, layerIdList, mapSettings );
 
-    QPainter thePainter( theImage );
-    thePainter.setRenderHint( QPainter::Antialiasing ); //make it look nicer
-
     QStringList layerSetIds = mapSettings.layerIds();
 
     QStringList highlightLayersId = QgsWmsConfigParser::addHighlightLayers( mParameters, layerSetIds );
@@ -1142,36 +1144,43 @@ namespace QgsWms
 
     applyOpacities( layersList, bkVectorRenderers, bkRasterRenderers, labelTransparencies, labelBufferTransparencies );
 
+    QScopedPointer<QPainter> painter;
+ 
     if ( hitTest )
-      runHitTest( mapSettings, &thePainter, *hitTest );
+    {
+      runHitTest( mapSettings, *hitTest );
+      painter.reset( new QPainter() );
+    }
     else
     {
-      QgsMapRendererCustomPainterJob renderJob( mapSettings, &thePainter );
 #ifdef HAVE_SERVER_PYTHON_PLUGINS
-      renderJob.setFeatureFilterProvider( mAccessControl );
+      mAccessControl->resolveFilterFeatures( mapSettings.layers() );
 #endif
-      renderJob.renderSynchronously();
+
+      QgsMapRendererJobProxy renderJob( mSettings.parallelRendering(), mSettings.maxThreads()
+#ifdef HAVE_SERVER_PYTHON_PLUGINS
+                                           , mAccessControl
+#endif
+     );
+      renderJob.render( mapSettings, theImage );
+      painter.reset( renderJob.takePainter() );
     }
 
     if ( mConfigParser )
     {
       //draw configuration format specific overlay items
-      mConfigParser->drawOverlays( &thePainter, theImage->dotsPerMeterX() / 1000.0 * 25.4, theImage->width(), theImage->height() );
+      mConfigParser->drawOverlays( painter.data(), theImage->dotsPerMeterX() / 1000.0 * 25.4, theImage->width(), theImage->height() );
+
     }
 
     restoreOpacities( bkVectorRenderers, bkRasterRenderers, labelTransparencies, labelBufferTransparencies );
     clearFeatureSelections( selectedLayerIdList );
     QgsWmsConfigParser::removeHighlightLayers( highlightLayersId );
 
-    // QgsMessageLog::logMessage( "clearing filters" );
     if ( !hitTest )
       QgsProject::instance()->removeAllMapLayers();
 
-    //#ifdef QGISDEBUG
-    //  theImage->save( QDir::tempPath() + QDir::separator() + "lastrender.png" );
-    //#endif
-
-    thePainter.end();
+    painter->end();
 
     //test if width / height ratio of image is the same as the ratio of WIDTH / HEIGHT parameters. If not, the image has to be scaled (required by WMS spec)
     int widthParam = mParameters.value( "WIDTH", "0" ).toInt();

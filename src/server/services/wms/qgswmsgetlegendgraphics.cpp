@@ -34,7 +34,8 @@ namespace QgsWms
     QgsWmsConfigParser* parser = getConfigParser( serverIface );
 
     QgsWmsServer server( serverIface->configFilePath(), params, parser,
-                         serverIface->accessControls() );
+                         serverIface->accessControls(),
+                        *serverIface->serverSettings());
     try
     {
       QScopedPointer<QImage> result( server.getLegendGraphics() );

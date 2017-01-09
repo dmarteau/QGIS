@@ -18,6 +18,7 @@ SET (wms_SRCS
   qgswmsgetstyles.cpp
   qgswmsservertransitional.cpp
   qgsfilterrestorer.cpp
+  qgsmapendererjobproxy.cpp
 )
 
 ########################################################

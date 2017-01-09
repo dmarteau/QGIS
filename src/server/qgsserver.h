@@ -35,6 +35,8 @@
 #include "qgsmapsettings.h"
 #include "qgsmessagelog.h"
 #include "qgsserviceregistry.h"
+#include "qgsserversettings.h"
+
 #include "qgsserverplugins.h"
 #include "qgsserverfilter.h"
 #include "qgsserverinterfaceimpl.h"
@@ -125,15 +127,14 @@ class SERVER_EXPORT QgsServer
     // Status
     static QString* sConfigFilePath;
     static QgsCapabilitiesCache* sCapabilitiesCache;
-#ifdef HAVE_SERVER_PYTHON_PLUGINS
     static QgsServerInterfaceImpl* sServerInterface;
-#endif
     //! Initialization must run once for all servers
     static bool sInitialised;
 
     //! service registry
     static QgsServiceRegistry sServiceRegistry;
 
+    static QgsServerSettings sSettings;
 };
 #endif // QGSSERVER_H
 

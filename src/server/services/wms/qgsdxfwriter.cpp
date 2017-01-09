@@ -124,7 +124,8 @@ namespace QgsWms
 
     QgsWmsServer server( serverIface->configFilePath(), params,
                          configParser,
-                         serverIface->accessControls() );
+                         serverIface->accessControls(),
+                        *serverIface->serverSettings());
 
     QList< QPair<QgsVectorLayer *, int > > layers;
     readDxfLayerSettings( server, configParser, layers, formatOptionsMap );

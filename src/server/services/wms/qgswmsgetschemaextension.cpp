@@ -34,7 +34,8 @@ namespace QgsWms
     {
       QgsWmsServer server( serverIface->configFilePath(), params,
                            getConfigParser( serverIface ),
-                           serverIface->accessControls() );
+                           serverIface->accessControls(),
+                          *serverIface->serverSettings());
       QDomDocument doc = server.getSchemaExtension();
       response.setHeader( QStringLiteral( "Content-Type" ), QStringLiteral( "text/xml; charset=utf-8" ) );
       response.write( doc.toByteArray() );

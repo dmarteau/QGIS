@@ -35,7 +35,7 @@ class QgsAccessControlFilter;
 #include "qgsserviceregistry.h"
 #include "qgis_server.h"
 
-
+class QgsServerSettings;
 
 /**
  * \ingroup server
@@ -111,7 +111,7 @@ class SERVER_EXPORT QgsServerInterface
     virtual void registerAccessControl( QgsAccessControlFilter* accessControl, int priority = 0 ) = 0;
 
     //! Gets the registred access control filters
-    virtual const QgsAccessControl* accessControls() const = 0;
+    virtual QgsAccessControl* accessControls() const = 0;
 
     //! Return an enrironment variable, used to pass  environment variables to python
     virtual QString getEnv( const QString& name ) const = 0;
@@ -145,6 +145,9 @@ class SERVER_EXPORT QgsServerInterface
      * @return QgsServiceResgistry
      */
     virtual QgsServiceRegistry* serviceRegistry() = 0;
+
+    //! @note not available in python bindings
+    virtual QgsServerSettings* serverSettings() = 0;
 
   private:
     QString mConfigFilePath;
