@@ -78,7 +78,8 @@ else(EXISTS "${PYTHON_INCLUDE_PATH}" AND EXISTS "${PYTHON_LIBRARY}" AND EXISTS "
     endif(python_config)
 
     # adapted from cmake's builtin FindPythonLibs
-    if(APPLE AND NOT _custom_python_fw)
+    # XXX Fix when PYTHON_LIBRARY defined
+    if(APPLE AND NOT _custom_python_fw AND NOT PYTHON_LIBRARY)
       CMAKE_FIND_FRAMEWORKS(Python)
       set(PYTHON_FRAMEWORK_INCLUDES)
       if(Python_FRAMEWORKS)
@@ -93,7 +94,7 @@ else(EXISTS "${PYTHON_INCLUDE_PATH}" AND EXISTS "${PYTHON_LIBRARY}" AND EXISTS "
         endif(NOT PYTHON_LIBRARY)
         set(PYTHONLIBRARY_FOUND TRUE)
       endif(Python_FRAMEWORKS)
-    endif(APPLE AND NOT _custom_python_fw)
+    endif(APPLE AND NOT _custom_python_fw AND NOT PYTHON_LIBRARY) 
   endif(PYTHONINTERP_FOUND)
 
   if(PYTHONLIBRARY_FOUND)
