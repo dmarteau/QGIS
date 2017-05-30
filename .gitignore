@@ -28,7 +28,6 @@ debian/*.substvars
 desktop.ini
 doc/INSTALL.tex
 i18n/*.qm
-Makefile
 ms-windows/*.exe*
 ms-windows/Installer-Files/postinstall.bat
 ms-windows/Installer-Files/preremove.bat
