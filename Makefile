@@ -1,14 +1,12 @@
 # 
 # Compile QGIS on OSX with qt4 and python 2.7 on MacPort platform
 #
-# IMPORTANT: 
-#  /opt/local/share must be linked to  opt/local/Library/Frameworks/Python.framework/Versions/3.6/share/sip
-#  for sip files to be found 
-#
 # INSTALL Note:
 #
-# Installation of /Applications/QGIS.app/Contents/Resources/python/PyQt4/Qsci.o is broken
-# and one must replace with /opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/PyQt4/Q# sci.so which has correct linking
+# Installation of /Applications/QGIS.app/Contents/Resources/python/PyQt4/Qsci.so is broken
+# and one must replace with /opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/PyQt4/Qsci.so which has correct linking
+#
+# install qwt60 +qt4 with option -f (force): even if it is marked as incompatible with qwt61 the
 #
 # Required python packages for Metasearch plugin:
 # py27-future
@@ -52,7 +50,6 @@ configure:
 		-DQSCINTILLA_LIBRARY:FILEPATH=/opt/local/libexec/qt4/lib/libqscintilla2_qt4.dylib \
 	..
 
-#		-DPYTHON_SITE_PACKAGES_DIR=$(PYTHON_FRAMEWORK)/lib/python2.7/site-packages \
 
 build:
 	cd $(BUILDDIR) && $(MAKE) $(JOBS)
@@ -67,7 +64,6 @@ clobber:
 	rm -rf $(BUILDDIR)
 
 run:
-	QT_QPA_PLATFORM_PLUGIN_PATH=/opt/local/libexec/qt5/plugins/platforms \
-		open $(INSTALL_PATH)/QGIS.app
+	open $(INSTALL_PATH)/QGIS.app
 
 
