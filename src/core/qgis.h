@@ -574,7 +574,7 @@ typedef unsigned long long qgssize;
 #if __cplusplus >= 201703L
 #define NODISCARD [[nodiscard]]
 #elif defined(__clang__)
-#define NODISCARD [[nodiscard]]
+#define NODISCARD // [[nodiscard]]
 #elif defined(_MSC_VER)
 #define NODISCARD // no support
 #elif defined(__has_cpp_attribute)
@@ -592,7 +592,7 @@ typedef unsigned long long qgssize;
 #if __cplusplus >= 201703L
 #define MAYBE_UNUSED [[maybe_unused]]
 #elif defined(__clang__)
-#define MAYBE_UNUSED [[maybe_unused]]
+#define MAYBE_UNUSED // [[maybe_unused]]
 #elif defined(_MSC_VER)
 #define MAYBE_UNUSED // no support
 #elif defined(__has_cpp_attribute)
