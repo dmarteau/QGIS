@@ -1990,6 +1990,7 @@ class CORE_EXPORT Qgis
      */
     enum class ProjectCapability : int
     {
+      NoProjectCapabilities = 0,
       ProjectStyles = 1 << 0, //!< Enable the project embedded style library. Enabling this flag can increase the time required to clear and load projects.
     };
     Q_ENUM( ProjectCapability )
