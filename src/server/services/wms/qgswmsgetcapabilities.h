@@ -27,6 +27,7 @@
 #include "qgslayertree.h"
 
 #include "qgswmsrequest.h"
+#include "qgswmslayerinfos.h"
 
 namespace QgsWms
 {
@@ -89,7 +90,30 @@ namespace QgsWms
                                 const QgsWmsRequest &request,
                                 bool projectSettings );
 
-  bool hasQueryableChildren( const QgsLayerTreeNode *childNode, const QStringList &wmsRestrictedLayers );
+  /**
+   * Returns true if at least one layer from the layers ids is queryable
+   * \param layerIds  list of layer ids
+   * \param wmsLayers WMS layers definition to build WMS capabilities
+   * \returns True if at least one layer form the layers ids is queryable
+   */
+  bool hasQueryableLayers( const QStringList &layerIds, const QMap< QString, layerInfos > &wmsLayerInfos );
+
+  /**
+   * Returns the combination of the WGS84 bounding rectangle of the layers from the list of layers ids
+   * \param layerIds  list of layer ids
+   * \param wmsLayers WMS layers definition to build WMS capabilities
+   * \returns the extent combination of the WGS84 bounding rectangle of the layers from the list of layers ids
+   */
+  QgsRectangle combineWgs84BoundingRect( const QStringList &layerIds, const QMap< QString, layerInfos > &wmsLayerInfos );
+
+  /**
+   * Returns the combinations of the extent CRSes of the layers from the list of layers ids
+   * \param layerIds  list of layer ids
+   * \param wmsLayers WMS layers definition to build WMS capabilities
+   * \returns the extent combination of the WGS84 bounding rectangle of the layers from the list of layers ids
+   */
+  QMap<QString, QgsRectangle> combineCrsExtents( const QStringList &layerIds, const QMap< QString, layerInfos > &wmsLayerInfos );
+
 } // namespace QgsWms
 
 #endif
